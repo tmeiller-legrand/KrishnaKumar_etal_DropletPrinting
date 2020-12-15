@@ -23,6 +23,8 @@ The script is organised like such:
       between 0.2 and 0.7 and outputting the results in an Excel file.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -67,9 +69,22 @@ def Technical_replicate_mean(FileName):
 
 # Calculating the average of the technical replicates for each biological
 # replicate
-br1 = Technical_replicate_mean("2019-10-11-TML_StrainRav_GrowthCurves-1.xlsx")
-br2 = Technical_replicate_mean("2019-10-18-TML_StrainsRav_GrowthCurves-2.xlsx")
-br3 = Technical_replicate_mean("2019-10-24-TML_StrainsRav_GrowthCurves-3.xlsx")
+#pathToBioRep1Data = "<Path to raw data Excel files for replicate 1"
+#pathToBioRep2Data = "<Path to raw data Excel files for replicate 2"
+#pathToBioRep3Data = "<Path to raw data Excel files for replicate 3"
+#nameOfRep1File = "<Name of Excel file for replicate 1"
+#nameOfRep2File = "<Name of Excel file for replicate 2"
+#nameOfRep3File = "<Name of Excel file for replicate 3"
+# In my case:
+pathToBioRep1Data = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/RawData/Bacterial-Growth-Kinetics/2019-10-11_StrainsRav_GrowthCurves-1/")
+pathToBioRep2Data = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/RawData/Bacterial-Growth-Kinetics/2019-10-18_StrainsRav_GrowthCurves-2/")
+pathToBioRep3Data = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/RawData/Bacterial-Growth-Kinetics/2019-10-24_StrainsRav_GrowthCurves-3/")
+nameOfRep1File = "2019-10-11-TML_StrainRav_GrowthCurves-1.xlsx"
+nameOfRep2File = "2019-10-18-TML_StrainsRav_GrowthCurves-2.xlsx"
+nameOfRep3File = "2019-10-24-TML_StrainsRav_GrowthCurves-3.xlsx"
+br1 = Technical_replicate_mean(pathToBioRep1Data / nameOfRep1File)
+br2 = Technical_replicate_mean(pathToBioRep2Data / nameOfRep2File)
+br3 = Technical_replicate_mean(pathToBioRep3Data / nameOfRep3File)
 
 # If one wants to do the anlysis on the average of the biological replicates,
 # this calculates it.
@@ -77,6 +92,10 @@ mean_biorep = []
 for j in range(21):
     temp_concatenated_data = pd.concat((br1[j], br2[j], br3[j]), axis=1)
     mean_biorep.append(temp_concatenated_data.mean(axis=1))
+
+pathToOutput = Path("<Path to the folder where the outputs should be saved>")
+# Example:
+# pathToOutput = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/Results/Bacterial-Growth-Kinetics/GrowthCurves_DoublingTime/")
 
 # Creates a graph with the mean growth curves.
 x = np.arange(0, 288*5, 5)  # Creates a vector for time. We have 288 time
@@ -124,8 +143,10 @@ ax.set_position([chartBox.x0,
 ax.legend(loc='upper center',
           bbox_to_anchor=(1.35, 1.025),
           shadow=False, ncol=1)
-plt.show()
-plt.savefig('2019-11-26-TML_DropletPriting_StrainsGrowthCurves_semilog',
+nameOfFigureFile = "<Name of figure output>"
+# Example:
+# nameOfFigureFile = "2019-11-26-TML_DropletPriting_StrainsGrowthCurves-Test"
+plt.savefig(pathToOutput / nameOfFigureFile,
             quality=100,
             dpi=300,
             bbox_inches='tight')
@@ -144,15 +165,16 @@ def fit_data(data_set):
         # (OD dropping) which might affect the fit.
         # We then Select the values of OD to do the fit on. Here values of OD
         # between 0.2 and 0.7.
-        sup0p2 = np.where(early_phase >= 0.2)  # Finds the OD value above 0.2
-        sup0p2_first = sup0p2[0][0]  # Takes the first of these values
-        # (first time OD goes above 0.2)
-        inf0p7 = np.where(early_phase <= 0.7)  # Finds the OD value below 0.7
-        inf0p7_last = inf0p7[0][-1]  # Takes the last of these values
+        expInBottom = np.where(early_phase >= 0.1)  # Finds the OD value above
+        # 0.2
+        expInBottom_first = expInBottom[0][0]  # Takes the first of these
+        # values (first time OD goes above 0.2)
+        expInTop = np.where(early_phase <= 0.3)  # Finds the OD value below 0.7
+        expInTop_last = expInTop[0][-1]  # Takes the last of these values
         # (last time OD is below 0.7)
         # The following do a linear fit of the data
-        x_exp = x[sup0p2_first:inf0p7_last]
-        y_exp = np.log(data_set[l][sup0p2_first:inf0p7_last])
+        x_exp = x[expInBottom_first:expInTop_last]
+        y_exp = np.log(data_set[l][expInBottom_first:expInTop_last])
         model.fit(x_exp.reshape((-1, 1)), y_exp)
         y_new = model.predict(x_exp[:, np.newaxis])
         xt2 = (np.log(2)/model.coef_)
@@ -171,6 +193,9 @@ doubling_times_br3 = fit_data(br3)
 doubling_times = fit_data(mean_biorep)
 
 # Saving the doubling times to an Excel file.
+nameOfDoublingTimeFile = "<Name of output file>.xlsx"
+# Example:
+# nameOfDoublingTimeFile = "2020-03-25-TML_DropletPrinting_StrainsDoublingTimes-Replicates-Liquid_0p2-0p8-Test.xlsx"
 array = [legend,
          list(doubling_times_br1),
          doubling_times_br2,
@@ -182,7 +207,4 @@ array_df.columns = ['Strains',
                     'Replicate 2',
                     'Replicate 3',
                     'Fit on mean']
-array_df.to_excel(excel_writer="/Users/user/Documents/DPhil_Projects/\
-                  Droplet-printing/Methods/StrainGrowthCurves/Analysis/\
-                  2020-03-25-TML_Droplet-printing_Strains-Doubling-Times-\
-                  Replicates-Liquid_0p2-0p7.xlsx")
+array_df.to_excel(excel_writer=pathToOutput / nameOfDoublingTimeFile)

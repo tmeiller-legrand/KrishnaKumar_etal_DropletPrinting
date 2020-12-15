@@ -66,9 +66,22 @@ def Technical_replicate_mean(FileName):
 
 # Calculating the average of the technical replicates for each biological
 # replicate
-br1 = Technical_replicate_mean("2019-10-11-TML_StrainRav_GrowthCurves-1.xlsx")
-br2 = Technical_replicate_mean("2019-10-18-TML_StrainsRav_GrowthCurves-2.xlsx")
-br3 = Technical_replicate_mean("2019-10-24-TML_StrainsRav_GrowthCurves-3.xlsx")
+pathToBioRep1Data = "<Path to raw data Excel files for replicate 1"
+pathToBioRep2Data = "<Path to raw data Excel files for replicate 2"
+pathToBioRep3Data = "<Path to raw data Excel files for replicate 3"
+nameOfRep1File = "<Name of Excel file for replicate 1"
+nameOfRep2File = "<Name of Excel file for replicate 2"
+nameOfRep3File = "<Name of Excel file for replicate 3"
+# In my case:
+# pathToBioRep1Data = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/RawData/Bacterial-Growth-Kinetics/2019-10-11_StrainsRav_GrowthCurves-1/")
+# pathToBioRep2Data = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/RawData/Bacterial-Growth-Kinetics/2019-10-18_StrainsRav_GrowthCurves-2/")
+#pathToBioRep3Data = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/RawData/Bacterial-Growth-Kinetics/2019-10-24_StrainsRav_GrowthCurves-3/")
+# nameOfRep1File = "2019-10-11-TML_StrainRav_GrowthCurves-1.xlsx"
+# nameOfRep2File = "2019-10-18-TML_StrainsRav_GrowthCurves-2.xlsx"
+# nameOfRep3File = "2019-10-24-TML_StrainsRav_GrowthCurves-3.xlsx"
+br1 = Technical_replicate_mean(pathToBioRep1Data / nameOfRep1File)
+br2 = Technical_replicate_mean(pathToBioRep2Data / nameOfRep2File)
+br3 = Technical_replicate_mean(pathToBioRep3Data / nameOfRep3File)
 
 # If one wants to do the anlysis on the average of the biological replicates,
 # this calculates it.
@@ -154,16 +167,18 @@ index0 = pd.DataFrame(['WT',
 
 # The following section saves the reformatted data to an excel file with the
 # various sheets DMFit requires.
-folder_path = Path('<Path to where the excel file should be saved+name.xlsx>')
-# Example, in my case:
-# folder_path = Path('/Users/user/Documents/DPhil_Projects/Droplet-printing/\
-#                   Methods/StrainGrowthCurves/Analysis/LagPhase/\
-#                   2020-02-01-TML_LagPhase_data-br3.xlsx')
+pathToOutput = "<Path to where the excel file should be saved>"
+nameOfOutput = "<Name of output file>.xlsx"
+# Example, in my case for replicate 1:
+# pathToOutput = Path("/Users/user/Documents/DPhil_Projects/Collaborations/KrishnaKumar_etal_DropletPrinting/Methods/Bacterial-Growth-Kinetics/GrowthCurves_Lag/Test/")
+# nameOfOutput = "2020-02-01-TML_LagPhase_data-br1.xlsx"
 
-writer = pd.ExcelWriter(folder_path, engine='xlsxwriter')
-# data_br1.to_excel(writer, sheet_name='Logc', index_label='logc')
-# data_br2.to_excel(writer, sheet_name='Logc', index_label='logc')
-data_br3.to_excel(writer, sheet_name='Logc', index_label='logc')
+# This then creates a file containing the reformatted data for biological
+# replicate 1. Biological replicates 2 and 3 can be outputted by filling an
+# appropriate name for the output file above and replacing data_br1 by data_br2
+# or data_br3 below.
+writer = pd.ExcelWriter(pathToOutput / nameOfOutput, engine='xlsxwriter')
+data_br1.to_excel(writer, sheet_name='Logc', index_label='logc')
 # data_mean.to_excel(writer, sheet_name='Logc', index_label='logc')
 index0.to_excel(writer, sheet_name='Index0', index=False)
 writer.save()
