@@ -2,6 +2,7 @@
 ---
 ![GitHub repo size](https://img.shields.io/github/repo-size/tmeiller-legrand/KrishnaKumar_etal_DropletPrinting)
 ![Github license](https://img.shields.io/github/license/tmeiller-legrand/KrishnaKumar_etal_DropletPrinting)
+![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4328623.svg)
 
 This repository contains the scripts used to analyse the data for the bacterial growth kinetics in the paper: "Droplet printing reveals the importance of micron-scale structure for bacterial ecology", Krishna Kumar et al. (2020-2021)
 DOI:  https://doi.org/10.1101/2020.10.20.346577
